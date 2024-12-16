@@ -1,0 +1,56 @@
+plugins {
+    id 'java'
+    id 'war'
+}
+
+group = 'ru.clevertec'
+
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+repositories {
+    mavenCentral()
+}
+ext{
+    mapstructVersion = '1.6.3'
+}
+
+dependencies {
+    implementation "org.hibernate.orm:hibernate-core:6.6.3.Final"
+    implementation 'org.hibernate.validator:hibernate-validator:8.0.1.Final'
+
+    annotationProcessor 'org.hibernate.orm:hibernate-jpamodelgen:6.6.3.Final'
+
+    implementation 'org.springframework:spring-core:6.2.0'
+    implementation 'org.springframework:spring-context:6.2.0'
+    implementation 'org.springframework:spring-webmvc:6.2.0'
+
+    implementation 'org.springframework.data:spring-data-jpa:3.4.0'
+
+    implementation 'org.yaml:snakeyaml:2.3'
+
+    implementation 'org.postgresql:postgresql:42.7.4'
+
+    testImplementation platform('org.junit:junit-bom:5.9.1')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+
+    implementation "org.mapstruct:mapstruct:${mapstructVersion}"
+    compileOnly "org.projectlombok:lombok:1.18.34"
+    annotationProcessor "org.projectlombok:lombok-mapstruct-binding:0.2.0"
+    annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+    annotationProcessor "org.projectlombok:lombok:1.18.34"
+
+    compileOnly 'jakarta.servlet:jakarta.servlet-api:6.1.0'
+
+    implementation 'org.liquibase:liquibase-core:4.30.0'
+    implementation 'com.google.code.gson:gson:2.11.0'
+
+
+
+}
+
+test {
+    useJUnitPlatform()
+}
