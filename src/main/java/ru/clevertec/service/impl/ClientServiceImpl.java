@@ -1,12 +1,14 @@
-package ru.clevertec.service;
+package ru.clevertec.service.impl;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import ru.clevertec.entity.Car;
 import ru.clevertec.entity.Client;
+import ru.clevertec.service.ClientService;
+import ru.clevertec.service.exception.ServiceException;
 import ru.clevertec.util.HibernateUtil;
 
-public class ClientServiceImpl {
+public class ClientServiceImpl implements ClientService {
 
     public void buyCar(Client client, Car car) {
         try (Session session = HibernateUtil.getSession()) {
@@ -16,21 +18,23 @@ public class ClientServiceImpl {
             session.persist(client);
             transaction.commit();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new ServiceException(e.getMessage());
         }
     }
 
-    public void create(Client client) {
+    @Override
+    public void save(Client client) {
         try (Session session = HibernateUtil.getSession()) {
             Transaction transaction = session.beginTransaction();
             session.persist(client);
             transaction.commit();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new ServiceException(e.getMessage());
         }
     }
 
-    public void delete(long id) {
+    @Override
+    public void deleteById(Long id) {
         try (Session session = HibernateUtil.getSession()) {
             Transaction transaction = session.beginTransaction();
             Client client = session.find(Client.class, id);
@@ -39,30 +43,29 @@ public class ClientServiceImpl {
             }
             transaction.commit();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new ServiceException(e.getMessage());
         }
     }
 
-    public void update(Client client) {
+    @Override
+    public void update(Long id, Client client) {
         try (Session session = HibernateUtil.getSession()) {
             Transaction transaction = session.beginTransaction();
             session.merge(client);
             transaction.commit();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new ServiceException(e.getMessage());
         }
     }
 
-    public Client get(long id) {
-        Client client = null;
+    @Override
+    public Client getById(Long id) {
         try (Session session = HibernateUtil.getSession()) {
-            Transaction transaction = session.beginTransaction();
-            client = session.find(Client.class, id);
-            transaction.commit();
+            Client client = session.find(Client.class, id);
+            return client;
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new ServiceException(e.getMessage());
         }
-        return client;
     }
 
 }

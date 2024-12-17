@@ -1,10 +1,8 @@
-package ru.clevertec.service;
-
+package ru.clevertec.service.impl;
 
 import jakarta.persistence.EntityGraph;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import org.hibernate.Session;
@@ -14,57 +12,66 @@ import org.hibernate.query.SelectionQuery;
 import org.hibernate.query.criteria.HibernateCriteriaBuilder;
 import ru.clevertec.entity.Car;
 import ru.clevertec.entity.Car_;
-import ru.clevertec.entity.Category;
+import ru.clevertec.service.exception.ServiceException;
 import ru.clevertec.util.HibernateUtil;
+import ru.clevertec.entity.Car;
+import ru.clevertec.entity.Category;
+import ru.clevertec.service.CarService;
 
 import java.util.List;
 
-public class CarServiceImpl {
+public class CarServiceImpl implements CarService {
 
-    public void create(Car car) {
+    @Override
+    public void save(Car car) {
         try (Session session = HibernateUtil.getSession()) {
             Transaction transaction = session.beginTransaction();
             session.persist(car);
             transaction.commit();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new ServiceException(e.getMessage());
         }
     }
 
-    public void delete(long id) {
+    @Override
+    public void deleteById(Long id) {
         try (Session session = HibernateUtil.getSession()) {
             Transaction transaction = session.beginTransaction();
             Car car = session.find(Car.class, id);
             if (car != null) {
                 session.remove(car);
+            }else{
+                throw new ServiceException("Car not found");
             }
             transaction.commit();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new ServiceException(e.getMessage());
         }
     }
 
-    public void update(Car car) {
+    @Override
+    public void update(Long id, Car car) {
         try (Session session = HibernateUtil.getSession()) {
             Transaction transaction = session.beginTransaction();
-            session.merge(car);
+            Car carFromDB = session.find(Car.class, id);
+            if (carFromDB != null) {
+                session.merge(car);
+            }else{
+                throw new ServiceException("Car not found");
+            }
             transaction.commit();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new ServiceException(e.getMessage());
         }
     }
 
-    public Car get(long id) {
-        Car car = null;
+    public Car getById(Long id) {
         try (Session session = HibernateUtil.getSession()) {
-            Transaction transaction = session.beginTransaction();
-            car = session.find(Car.class, id);
-            transaction.commit();
-
+            Car car = session.find(Car.class, id);
+            return car;
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new ServiceException(e.getMessage());
         }
-        return car;
     }
 
     public List<Car> findCarsByFilters(String carMake, String year, Category category, String minPrice, String maxPrice) {

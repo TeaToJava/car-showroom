@@ -1,22 +1,26 @@
-package ru.clevertec.service;
+package ru.clevertec.service.impl;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import ru.clevertec.entity.Category;
+import ru.clevertec.service.CategoryService;
+import ru.clevertec.service.exception.ServiceException;
 import ru.clevertec.util.HibernateUtil;
 
-public class CategoryServiceImpl {
-    public void create(Category category) {
+public class CategoryServiceImpl implements CategoryService {
+    @Override
+    public void save(Category category) {
         try (Session session = HibernateUtil.getSession()) {
             Transaction transaction = session.beginTransaction();
             session.save(category);
             transaction.commit();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new ServiceException(e.getMessage());
         }
     }
 
-    public void delete(long id) {
+    @Override
+    public void deleteById(Long id) {
         try (Session session = HibernateUtil.getSession()) {
             Transaction transaction = session.beginTransaction();
             Category category = session.find(Category.class, id);
@@ -25,30 +29,28 @@ public class CategoryServiceImpl {
             }
             transaction.commit();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new ServiceException(e.getMessage());
         }
     }
 
-    public void update(Category category) {
+    @Override
+    public void update(Long id, Category category) {
         try (Session session = HibernateUtil.getSession()) {
             Transaction transaction = session.beginTransaction();
             session.merge(category);
             transaction.commit();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new ServiceException(e.getMessage());
         }
     }
 
-    public Category get(long id) {
-        Category category = null;
+    @Override
+    public Category getById(Long id) {
         try (Session session = HibernateUtil.getSession()) {
-            Transaction transaction = session.beginTransaction();
-            category = session.find(Category.class, id);
-            transaction.commit();
-
+            Category category = session.find(Category.class, id);
+            return category;
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new ServiceException(e.getMessage());
         }
-        return category;
     }
 }

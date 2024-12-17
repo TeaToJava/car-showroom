@@ -1,4 +1,4 @@
-package ru.clevertec.service;
+package ru.clevertec.service.impl;
 
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
@@ -10,12 +10,15 @@ import ru.clevertec.entity.Car;
 import ru.clevertec.entity.Client;
 import ru.clevertec.entity.Review;
 import ru.clevertec.entity.Review_;
+import ru.clevertec.service.ReviewService;
+import ru.clevertec.service.exception.ServiceException;
 import ru.clevertec.util.HibernateUtil;
 
 import java.util.List;
 
-public class ReviewServiceImpl {
+public class ReviewServiceImpl implements ReviewService {
 
+    @Override
     public void addReview(Client client, Car car, String text, int rating) {
         try (Session session = HibernateUtil.getSession()) {
             Transaction transaction = session.beginTransaction();
@@ -24,10 +27,11 @@ public class ReviewServiceImpl {
             session.merge(client);
             transaction.commit();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new ServiceException(e.getMessage());
         }
     }
 
+    @Override
     public List<Review> searchReviews(String keyword){
         try (Session session = HibernateUtil.getSession()) {
             HibernateCriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
@@ -38,22 +42,23 @@ public class ReviewServiceImpl {
             List<Review> reviews =  query.getResultList();
             return reviews;
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new ServiceException(e.getMessage());
         }
-        return null;
     }
 
-    public void create(Review review) {
+    @Override
+    public void save(Review review) {
         try (Session session = HibernateUtil.getSession()) {
             Transaction transaction = session.beginTransaction();
             session.persist(review);
             transaction.commit();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new ServiceException(e.getMessage());
         }
     }
 
-    public void delete(long id) {
+    @Override
+    public void deleteById(Long id) {
         try (Session session = HibernateUtil.getSession()) {
             Transaction transaction = session.beginTransaction();
             Review review = session.find(Review.class, id);
@@ -62,29 +67,28 @@ public class ReviewServiceImpl {
             }
             transaction.commit();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new ServiceException(e.getMessage());
         }
     }
 
-    public void update(Review review) {
+    @Override
+    public void update(Long id, Review review) {
         try (Session session = HibernateUtil.getSession()) {
             Transaction transaction = session.beginTransaction();
             session.merge(review);
             transaction.commit();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new ServiceException(e.getMessage());
         }
     }
 
-    public Review get(long id) {
-        Review review = null;
+    @Override
+    public Review getById(Long id) {
         try (Session session = HibernateUtil.getSession()) {
-            Transaction transaction = session.beginTransaction();
-            review = session.find(Review.class, id);
-            transaction.commit();
+            Review review = session.find(Review.class, id);
+            return review;
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new ServiceException(e.getMessage());
         }
-        return review;
     }
 }
